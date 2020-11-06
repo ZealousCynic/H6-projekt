@@ -6,7 +6,7 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:local="clr-namespace:protosort2"
         mc:Ignorable="d"
-        Title="Generer datasæt" Height="200" Width="300" HorizontalAlignment="Center" VerticalAlignment="Center">
+        Title="Generer datasæt" Height="200" Width="300" HorizontalAlignment="Center" VerticalAlignment="Center" WindowStartupLocation="CenterOwner">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using protosort2.SortingVisualization;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -23,20 +24,20 @@ namespace protosort2
     public partial class MainWindow : Window
     {
         Dataset dataset;
-        SortingAlgorithmConstroller SortingAlgorithmConstroller;
+        SortingAlgorithmHandler sortingAlgorithmHandler;
         CheckBox[] checkboxSortingAlgorithms;
 
         public MainWindow()
         {
             InitializeComponent();
             dataset = new Dataset();
-            SortingAlgorithmConstroller = new SortingAlgorithmConstroller();
+            sortingAlgorithmHandler = new SortingAlgorithmHandler();
 
-            checkboxSortingAlgorithms = new CheckBox[SortingAlgorithmConstroller.SortingAlgorithms.Length];
-            for(int i = 0; i < SortingAlgorithmConstroller.SortingAlgorithms.Length; i++)
+            checkboxSortingAlgorithms = new CheckBox[sortingAlgorithmHandler.SortingAlgorithms.Length];
+            for(int i = 0; i < sortingAlgorithmHandler.SortingAlgorithms.Length; i++)
             {
                 checkboxSortingAlgorithms[i] = new CheckBox();
-                checkboxSortingAlgorithms[i].Content = SortingAlgorithmConstroller.SortingAlgorithms[i].Name;
+                checkboxSortingAlgorithms[i].Content = sortingAlgorithmHandler.SortingAlgorithms[i].Name;
                 SortingAlgorithmCheckList.Children.Add(checkboxSortingAlgorithms[i]);
             }
 
@@ -61,23 +62,20 @@ namespace protosort2
 
         }
 
-        private void ButtonGenerateDataset(object sender, RoutedEventArgs e)
+        private void GenerateDataset(object sender, RoutedEventArgs e)
         {
             DataSetGenerateDialogue dlg = new DataSetGenerateDialogue();
 
-            // Configure the dialog box
             dlg.Owner = this;
 
-            // Open the dialog box modally
             dlg.ShowDialog();
-            // Process data entered by user if dialog box is accepted
             if (dlg.DialogResult == true)
             {
                 dataset.GenerateDataset(int.Parse(dlg.InputCount.Text), int.Parse(dlg.InputMaxNumber.Text));
             }
         }
 
-        private void ButtonOpenFile(object sender, RoutedEventArgs e)
+        private void OpenFile(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "Comma seperated files (*.csv)|*.csv|All files (*.*)|*.*";
@@ -85,11 +83,11 @@ namespace protosort2
             {
                 string fileName = openFileDialog.FileName;
                 string fileText = File.ReadAllText(fileName);
-                dataset.Import(fileText, fileName);
+                dataset.ImportCSVFile(fileText, fileName);
             }
         }
 
-        private void ButtonSaveFileDialog(object sender, RoutedEventArgs e)
+        private void SaveFileDialog(object sender, RoutedEventArgs e)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.Filter = "Comma-seperated file (*.csv)|*.csv";
@@ -97,32 +95,100 @@ namespace protosort2
                 File.WriteAllText(saveFileDialog.FileName, dataset.ToCSVString());
         }
 
-        private void ButtonInspectDataset(object sender, RoutedEventArgs e)
+        private void InspectDataset(object sender, RoutedEventArgs e)
         {
             DatasetView dlg = new DatasetView();
 
-            // Configure the dialog box
             dlg.Owner = this;
             dlg.Text = dataset.ToNewlineString();
-            // Open the dialog box modally
             dlg.Show();
         }
 
-        private void ButtonCreateStatistics(object sender, RoutedEventArgs e)
+        private void CreateStatistics(object sender, RoutedEventArgs e)
         {
+            if(dataset.Count > 10000)
+            {
+                if (ShowContinueSortingDialogue() == false) return;
+            }
+            this.ForceCursor = true;
+            this.Cursor = Cursors.Wait;
             string statistics = "Resultat af sorterings-algoritmer:";
             for(int i = 0; i < checkboxSortingAlgorithms.Length; i++)
             {
                 if(checkboxSortingAlgorithms[i].IsChecked == true)
                 {
-                    SortingAlgorithmConstroller.SortingAlgorithms[i].SortDataset(dataset);
+                    checkboxSortingAlgorithms[i].FontWeight = FontWeights.Bold; // not working???
+                    sortingAlgorithmHandler.SortingAlgorithms[i].SortDataset(dataset);
                     statistics +=
                         $"{Environment.NewLine}" + 
-                        $"Algoritme: {SortingAlgorithmConstroller.SortingAlgorithms[i].Name}" +
-                        $" med tiden: {SortingAlgorithmConstroller.SortingAlgorithms[i].TimeConsumed.TotalSeconds}";
+                        $"Algoritme: {sortingAlgorithmHandler.SortingAlgorithms[i].Name}" +
+                        $" med tiden: {sortingAlgorithmHandler.SortingAlgorithms[i].TimeConsumed.TotalSeconds}";
+                    checkboxSortingAlgorithms[i].FontWeight = FontWeights.Normal;
                 }
             }
+            this.Cursor = Cursors.Arrow;
             MessageBox.Show(statistics);
+        }
+
+        private bool ShowContinueSortingDialogue()
+        {
+            string messageBoxText =
+                $"Datasættet indeholder et højt antal elementer, og det kan tage lang tid at sortere.{Environment.NewLine}Ønsker du at fortsætte?";
+            string caption = "Tidskrævende sortering";
+            MessageBoxButton button = MessageBoxButton.YesNo;
+            MessageBoxImage icon = MessageBoxImage.Warning;
+            MessageBoxResult result = MessageBox.Show(messageBoxText, caption, button, icon);
+
+            if (result == MessageBoxResult.Yes) return true;
+            return false;
+        }
+
+        private void DatasetCountText_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if(int.Parse(DatasetCountText.Text) > 0)
+            {
+                this.ButtonCreateStatistics.IsEnabled = true;
+                this.ButtonCreateStatistics.FontStyle = FontStyles.Normal;
+                foreach(Button button in this.SortingVisualizationButtonList.Children)
+                {
+                    button.IsEnabled = true;
+                    button.FontStyle = FontStyles.Normal;
+                }
+            }
+            else
+            {
+                this.ButtonCreateStatistics.IsEnabled = false;
+                this.ButtonCreateStatistics.FontStyle = FontStyles.Italic;
+                foreach (Button button in this.SortingVisualizationButtonList.Children)
+                {
+                    button.IsEnabled = false;
+                    button.FontStyle = FontStyles.Italic;
+                }
+            }
+        }
+
+        private void ButtonVisualizeBubblesort(object sender, RoutedEventArgs e)
+        {
+            if (dataset.Count > 20)
+            {
+                if (ShowContinueVisualizingDialogue() == false) return;
+            }
+
+            BubblesortVisualization bsv = new BubblesortVisualization();
+            bsv.Dataset = this.dataset;
+            bsv.Show();
+        }
+
+        private bool ShowContinueVisualizingDialogue()
+        {
+            string messageBoxText =
+                $"Datasættet indeholder et højt antal elementer, der kan ødelægge visualiseringen.{Environment.NewLine}Ønsker du at fortsætte?";
+            string caption = "Stor visualisering";
+            MessageBoxButton button = MessageBoxButton.YesNo;
+            MessageBoxImage icon = MessageBoxImage.Warning;
+            MessageBoxResult result = MessageBox.Show(messageBoxText, caption, button, icon);
+            if (result == MessageBoxResult.Yes) return true;
+            return false;
         }
     }
 }

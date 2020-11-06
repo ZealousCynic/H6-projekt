@@ -5,18 +5,19 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:protosort2"
         mc:Ignorable="d"
-        Title="Prosort" Height="600" Width="800">
+        Title="Prosort" Height="600" Width="800" Background="LightGray" WindowStartupLocation="CenterScreen">
     <Grid Margin="10, 10, 10, 10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition />
         </Grid.RowDefinitions>
-        <Label Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center" FontFamily="Trebuchet MS" 
- FontWeight="Bold" FontSize="18" Foreground="#0066cc">Protosort</Label>
+        <Label Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center" FontFamily="Trebuchet MS" FontWeight="Bold" FontSize="18" Foreground="#0066cc">Protosort</Label>
         <GroupBox Header="Datasæt" Margin="10" Padding="10" Grid.Row="1">
             <Grid>
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
@@ -24,30 +25,24 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-
-                <Button Grid.Column="0" Grid.Row="0" Width="200" Margin="80,5,80,0" Click="ButtonGenerateDataset" Height="24" VerticalAlignment="Top">Generer datasæt</Button>
-                <Button Grid.Column="0" Grid.Row="1" Width="200" Margin="5" Click="ButtonOpenFile">Indlæs datasæt</Button>
-                <Button Grid.Column="0" Grid.Row="2" Width="200" Margin="5" Click="ButtonSaveFileDialog">Gem datasæt</Button>
-                <Button Grid.Column="0" Grid.Row="3" Width="200" Margin="5" Click="ButtonInspectDataset">Se datasæt</Button>
-                <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="0" Margin="2" HorizontalAlignment="Center">
-                    <Label Width="75" Margin="2">Datasæt:</Label>
-                    <TextBox Width="200" Margin="2" Name="DatasetDescriptionText" Text="{Binding DatasetDescription, Mode=OneWay, UpdateSourceTrigger=Default}" IsReadOnly="True"/>
+                <StackPanel Orientation="Horizontal" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" Margin="2" HorizontalAlignment="Center">
+                    <Label Width="75" Margin="2">Fil:</Label>
+                    <TextBox Width="200" Margin="2" Name="DatasetDescriptionText" Background="Silver" Text="{Binding DatasetDescription, Mode=OneWay, UpdateSourceTrigger=Default}" IsReadOnly="True"/>
                 </StackPanel>
-                <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="1" Margin="2" HorizontalAlignment="Center">
+                <Button Grid.Column="0" Grid.Row="1" Width="100" Margin="5" Click="OpenFile">Indlæs...</Button>
+                <Button Grid.Column="1" Grid.Row="1" Width="100" Margin="5" Click="SaveFileDialog">Gem...</Button>
+                
+                <StackPanel Orientation="Horizontal" Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="0" Margin="2" HorizontalAlignment="Center">
                     <Label Width="75" Margin="2">Antal:</Label>
-                    <TextBox Width="200" Margin="2" Name="DatasetCountText"  Text="{Binding DatasetCount, Mode=OneWay, UpdateSourceTrigger=Default}" IsReadOnly="True"/>
+                    <TextBox Width="200" Margin="2" Name="DatasetCountText" Background="Silver" Text="{Binding DatasetCount, Mode=OneWay, UpdateSourceTrigger=Default}" IsReadOnly="True" TextChanged="DatasetCountText_TextChanged"/>
                 </StackPanel>
-                <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="2" Margin="2" HorizontalAlignment="Center">
+                <StackPanel Orientation="Horizontal" Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="1" Margin="2" HorizontalAlignment="Center">
                     <Label Width="75" Margin="2">Højeste tal:</Label>
-                    <TextBox Width="200" Margin="2" Name="DatasetMaxNumberText" Text="{Binding DatasetMaxNumber, Mode=OneWay, UpdateSourceTrigger=Default}" IsReadOnly="True"/>
+                    <TextBox Width="200" Margin="2" Name="DatasetMaxNumberText" Background="Silver" Text="{Binding DatasetMaxNumber, Mode=OneWay, UpdateSourceTrigger=Default}" IsReadOnly="True"/>
                 </StackPanel>
-                <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="3" Margin="2" HorizontalAlignment="Center">
-                    <Label Width="75" Margin="2">Eksempel:</Label>
-                    <TextBox Width="200" Margin="2" Name="DatasetExampleText" Text="{Binding DatasetExample, Mode=OneWay, UpdateSourceTrigger=Default}" IsReadOnly="True"/>
-                </StackPanel>
-
+                <Button Grid.Column="2" Grid.Row="2" Width="125" Margin="5" Click="GenerateDataset" Height="24" VerticalAlignment="Top">Generer datasæt...</Button>
+                <Button Grid.Column="3" Grid.Row="2" Width="125" Margin="5" Click="InspectDataset">Se datasæt</Button>
             </Grid>
         </GroupBox>
         <Grid Grid.Row="2" Margin="10">
@@ -63,12 +58,12 @@
                     </Grid.RowDefinitions>
                     <StackPanel Orientation="Vertical" Grid.Row="0" Margin="2" HorizontalAlignment="Center" Name="SortingAlgorithmCheckList" CanVerticallyScroll="True" />
 
-                    <Button Width="150" Margin="5" Grid.Row="1" Click="ButtonCreateStatistics">Sammenlign</Button>
+                    <Button Width="150" Margin="5" Name="ButtonCreateStatistics" Grid.Row="1" Click="CreateStatistics">Sammenlign</Button>
                 </Grid>
             </GroupBox>
             <GroupBox Grid.Column="1" Header="Visualisering" Margin="2" Padding="2">
-                <StackPanel Orientation="Vertical" Margin="2" HorizontalAlignment="Center">
-                    <Frame Height="200" Source="/protosort2;component/ProtoSortVisualization.xaml"></Frame>
+                <StackPanel Orientation="Vertical" Margin="2" HorizontalAlignment="Center" Name="SortingVisualizationButtonList" CanVerticallyScroll="True">
+                    <Button Width="250" Content="Bubblesort" HorizontalAlignment="Center" ToolTip="Bubblesort visualisering" Click="ButtonVisualizeBubblesort" />
                 </StackPanel>
             </GroupBox>
         </Grid>

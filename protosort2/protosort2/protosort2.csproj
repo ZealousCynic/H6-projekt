@@ -62,14 +62,14 @@
     <Compile Include="DatasetView.xaml.cs">
       <DependentUpon>DatasetView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="SortingAlgorithmConstroller.cs" />
+    <Compile Include="SortingAlgorithmHandler.cs" />
     <Compile Include="SortingAlgorithm\BubbleSort.cs" />
     <Compile Include="SortingAlgorithm\ISortingAlgorithm.cs" />
-    <Compile Include="ProtoSortVisualization.xaml.cs">
-      <DependentUpon>ProtoSortVisualization.xaml</DependentUpon>
-    </Compile>
     <Compile Include="SortingAlgorithm\SortingAlgorithmn.cs" />
-    <Compile Include="SortingVisualization\ISortingVisualization.cs" />
+    <Compile Include="SortingVisualization\BubblesortVisualization.xaml.cs">
+      <DependentUpon>BubblesortVisualization.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SortingVisualization\Variable.cs" />
     <Page Include="DataSetGenerateDialogue.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -90,7 +90,7 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="ProtoSortVisualization.xaml">
+    <Page Include="SortingVisualization\BubblesortVisualization.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

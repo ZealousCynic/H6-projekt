@@ -82,7 +82,7 @@ namespace protosort2
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        internal void Import(string fileText, string fileName)
+        internal void ImportCSVFile(string fileText, string fileName)
         {
             try
             {

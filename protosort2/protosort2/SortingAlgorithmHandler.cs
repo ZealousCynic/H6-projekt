@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace protosort2
 {
-    class SortingAlgorithmConstroller
+    class SortingAlgorithmHandler
     {
         readonly ISortingAlgorithm[] sortingAlgorithms;
         internal ISortingAlgorithm[] SortingAlgorithms { get => sortingAlgorithms;}
 
-        public SortingAlgorithmConstroller()
+        public SortingAlgorithmHandler()
         {
             sortingAlgorithms = new ISortingAlgorithm[]
             {
